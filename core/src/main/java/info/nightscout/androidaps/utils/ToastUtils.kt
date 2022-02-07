@@ -71,7 +71,7 @@ object ToastUtils {
         string: String?, soundID: Int
     ) {
         showToastInUiThread(ctx, string)
-        playSound(ctx, soundID)
+//PBA        playSound(ctx, soundID)
         val notification = Notification(Notification.TOAST_ALARM, string!!, Notification.URGENT)
         rxBus.send(EventNewNotification(notification))
     }

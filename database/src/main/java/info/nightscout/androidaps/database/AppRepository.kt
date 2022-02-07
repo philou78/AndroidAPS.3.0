@@ -70,6 +70,13 @@ import kotlin.math.roundToInt
             .map { if (!ascending) it.reversed() else it }
             .subscribeOn(Schedulers.io())
 
+//PBA Start
+    fun compatGetBgReadingsDataFromTime(start: Long, end: Long, limit: Int, ascending: Boolean): Single<List<GlucoseValue>> =
+        database.glucoseValueDao.compatGetBgReadingsDataFromTime(start, end, limit)
+            .map { if (!ascending) it.reversed() else it }
+            .subscribeOn(Schedulers.io())
+//PBA End
+
     //BG READINGS -- including invalid/history records
     fun findBgReadingByNSIdSingle(nsId: String): Single<ValueWrapper<GlucoseValue>> =
         database.glucoseValueDao.findByNSIdMaybe(nsId).toWrappedSingle()

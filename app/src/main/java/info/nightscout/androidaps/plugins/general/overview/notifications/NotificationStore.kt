@@ -5,8 +5,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.RingtoneManager
+//PBA import android.media.AudioManager
+//PBA import android.media.RingtoneManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -105,7 +105,7 @@ class NotificationStore @Inject constructor(
         val mgr = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val largeIcon = rh.decodeResource(iconsProvider.getIcon())
         val smallIcon = iconsProvider.getNotificationIcon()
-        val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+//PBA        val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(smallIcon)
             .setLargeIcon(largeIcon)
@@ -117,7 +117,7 @@ class NotificationStore @Inject constructor(
         if (n.level == Notification.URGENT) {
             notificationBuilder.setVibrate(longArrayOf(1000, 1000, 1000, 1000))
                 .setContentTitle(rh.gs(R.string.urgent_alarm))
-                .setSound(sound, AudioManager.STREAM_ALARM)
+//PBA                .setSound(sound, AudioManager.STREAM_ALARM)
         } else {
             notificationBuilder.setVibrate(longArrayOf(0, 100, 50, 100, 50))
                 .setContentTitle(rh.gs(R.string.info))

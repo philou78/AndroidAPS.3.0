@@ -36,6 +36,11 @@ internal interface GlucoseValueDao : TraceableDao<GlucoseValue> {
     @Query("SELECT * FROM $TABLE_GLUCOSE_VALUES WHERE timestamp BETWEEN :start AND :end AND isValid = 1 AND referenceId IS NULL AND value >= 39 ORDER BY timestamp ASC")
     fun compatGetBgReadingsDataFromTime(start: Long, end: Long): Single<List<GlucoseValue>>
 
+//PBA Start
+    @Query("SELECT * FROM $TABLE_GLUCOSE_VALUES WHERE timestamp BETWEEN :start AND :end AND isValid = 1 AND referenceId IS NULL AND value >= 39 ORDER BY timestamp ASC LIMIT :limit")
+    fun compatGetBgReadingsDataFromTime(start: Long, end: Long, limit: Int): Single<List<GlucoseValue>>
+//PBA End
+
     @Query("SELECT * FROM $TABLE_GLUCOSE_VALUES WHERE id > :lastId AND referenceId IS NULL ORDER BY timestamp ASC")
     fun getDataFromId(lastId: Long): Single<List<GlucoseValue>>
 

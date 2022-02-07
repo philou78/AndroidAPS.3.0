@@ -31,7 +31,8 @@ class TddCalculator @Inject constructor(
 ) {
 
     fun calculate(days: Long): LongSparseArray<TotalDailyDose> {
-        val startTime = MidnightTime.calc(dateUtil.now() - T.days(days).msecs())
+//PBA        val startTime = MidnightTime.calc(dateUtil.now() - T.days(days).msecs())
+        val startTime = getStartTime(days) //PBA
         val endTime = MidnightTime.calc(dateUtil.now())
 
         val result = LongSparseArray<TotalDailyDose>()
@@ -93,13 +94,23 @@ class TddCalculator @Inject constructor(
     }
 
     fun stats(): Spanned {
-        val tdds = calculate(7)
-        val averageTdd = averageTDD(tdds)
+//PBA        val tdds = calculate(7)
+//PBA        val averageTdd = averageTDD(tdds)
+        val tdds7 = calculate(7) //PBA
+        val averageTdd7 = averageTDD(tdds7) //PBA
+        val tdds30 = calculate(30) //PBA
+        val averageTdd30 = averageTDD(tdds30) //PBA
+        val tdds90 = calculate(90) //PBA
+        val averageTdd90 = averageTDD(tdds90) //PBA
         return HtmlHelper.fromHtml(
             "<b>" + rh.gs(R.string.tdd) + ":</b><br>" +
-                toText(tdds, true) +
+//PBA                toText(tdds, true) +
+                toText(tdds7, true) + //PBA
                 "<b>" + rh.gs(R.string.average) + ":</b><br>" +
-                averageTdd.toText(rh, tdds.size(), true)
+//PBA                averageTdd.toText(rh, tdds.size(), true)
+                averageTdd7.toText(rh, tdds7.size(), true) + //PBA
+            "<br>" + averageTdd30.toText(rh, tdds30.size(), true) + //PBA
+            "<br>" + averageTdd90.toText(rh, tdds90.size(), true) //PBA
         )
     }
 
@@ -111,4 +122,13 @@ class TddCalculator @Inject constructor(
         }
         return t
     }
+//PBA Start
+    private fun getStartTime(days: Long): Long {
+        val start = MidnightTime.calc(dateUtil.now() - T.days(days).msecs())
+        val end = MidnightTime.calc(dateUtil.now())
+        val bgReadingList = repository.compatGetBgReadingsDataFromTime(start, end, 1, true)
+            .blockingGet()
+        return start.coerceAtLeast(MidnightTime.calc(bgReadingList[0].timestamp))
+    }
+//PBA End
 }

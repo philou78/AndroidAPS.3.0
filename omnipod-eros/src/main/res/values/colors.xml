@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Button icons - general -->
-    <color name="rl_icon_outline">#b9d2d2</color>
-    <color name="rl_board_shape">#66BB6A</color>
-    <color name="rl_antenna_shape">#FF7043</color>
+    <!--PBA color name="rl_icon_outline">#b9d2d2</color-->
+    <color name="rl_icon_outline">
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:color="@color/omnipod_button_disabled" android:state_enabled="false"/>
+            <item android:color="#b9d2d2"/>
+        </selector>
+    </color>
+    <!--PBA color name="rl_board_shape">#66BB6A</color-->
+    <color name="rl_board_shape">
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:color="@color/omnipod_button_disabled" android:state_enabled="false"/>
+            <item android:color="#66BB6A"/>
+        </selector>
+    </color>
+    <!--PBA color name="rl_antenna_shape">#FF7043</color-->
+    <color name="rl_antenna_shape">
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:color="@color/omnipod_button_disabled" android:state_enabled="false"/>
+            <item android:color="#FF7043"/>
+        </selector>
+    </color>
 
     <!-- Actions tab - Button icons -->
-    <color name="ic_pod_activity_reset_rileylink_config">@color/rl_board_shape</color>
-    <color name="ic_pod_activity_reset_rileylink_config_outline">@color/rl_icon_outline</color>
+    <!--PBA color name="ic_pod_activity_reset_rileylink_config">@color/rl_board_shape</color-->
+    <!--PBA color name="ic_pod_activity_reset_rileylink_config_outline">@color/rl_icon_outline</color-->
 
     <!-- Pod Management - Button icons -->
-    <color name="ic_pod_management_rl_stats">@color/rl_board_shape</color>
-    <color name="ic_pod_management_rl_stats_outline">@color/rl_icon_outline</color>
+    <!--PBA color name="ic_pod_management_rl_stats">@color/rl_board_shape</color-->
+    <!--PBA color name="ic_pod_management_rl_stats_outline">@color/rl_icon_outline</color-->
 </resources>

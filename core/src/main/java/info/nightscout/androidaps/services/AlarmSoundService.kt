@@ -4,12 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Binder
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import dagger.android.DaggerService
-import info.nightscout.androidaps.activities.ErrorHelperActivity
+//PBA import info.nightscout.androidaps.activities.ErrorHelperActivity
 import info.nightscout.androidaps.core.R
 import info.nightscout.androidaps.interfaces.NotificationHolder
 import info.nightscout.shared.logging.AAPSLogger
@@ -29,6 +26,8 @@ class AlarmSoundService : DaggerService() {
 
     private var player: MediaPlayer? = null
     private var resourceId = R.raw.error
+    private var vibrator: Vibrator? = null //PBA
+    private var vibrating = false //PBA
 
     companion object {
 
@@ -69,30 +68,69 @@ class AlarmSoundService : DaggerService() {
         startForeground(notificationHolder.notificationID, notificationHolder.notification)
         aapsLogger.debug(LTag.CORE, "onStartCommand Foreground called")
 
-        player?.let { if (it.isPlaying) it.stop() }
-
-        if (intent?.hasExtra(ErrorHelperActivity.SOUND_ID) == true) resourceId = intent.getIntExtra(ErrorHelperActivity.SOUND_ID, R.raw.error)
-        player = MediaPlayer()
+//PBA Start
+//PBA        player?.let { if (it.isPlaying) it.stop() }
+//PBA
+//PBA        if (intent?.hasExtra(ErrorHelperActivity.SOUND_ID) == true) resourceId = intent.getIntExtra(ErrorHelperActivity.SOUND_ID, R.raw.error)
+//PBA        player = MediaPlayer()
+//PBA        try {
+//PBA            val afd = rh.openRawResourceFd(resourceId) ?: return START_STICKY
+//PBA            player?.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+//PBA            afd.close()
+//PBA            player?.isLooping = true
+//PBA            val audioManager = getAudioManager()
+//PBA            if (!audioManager.isMusicActive) {
+//PBA                if (sp.getBoolean(R.string.key_gradually_increase_notification_volume, false)) {
+//PBA                    currentVolumeLevel = 0
+//PBA                    player?.setVolume(0f, 0f)
+//PBA                    increaseVolumeHandler.postDelayed(volumeUpdater, VOLUME_INCREASE_INITIAL_SILENT_TIME_MILLIS)
+//PBA                } else {
+//PBA                    player?.setVolume(1f, 1f)
+//PBA                }
+//PBA            }
+//PBA            player?.prepare()
+//PBA            player?.start()
+//PBA        } catch (e: Exception) {
+//PBA            aapsLogger.error("Unhandled exception", e)
+//PBA        }
+//
         try {
-            val afd = rh.openRawResourceFd(resourceId) ?: return START_STICKY
-            player?.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-            afd.close()
-            player?.isLooping = true
             val audioManager = getAudioManager()
-            if (!audioManager.isMusicActive) {
-                if (sp.getBoolean(R.string.key_gradually_increase_notification_volume, false)) {
-                    currentVolumeLevel = 0
-                    player?.setVolume(0f, 0f)
-                    increaseVolumeHandler.postDelayed(volumeUpdater, VOLUME_INCREASE_INITIAL_SILENT_TIME_MILLIS)
-                } else {
-                    player?.setVolume(1f, 1f)
+
+            when (audioManager.ringerMode) {
+                AudioManager.RINGER_MODE_NORMAL  -> {
+                    player?.let { if (it.isPlaying) it.stop() }
+                    if (intent?.hasExtra("soundid") == true) resourceId = intent.getIntExtra("soundid", R.raw.error)
+                    player = MediaPlayer()
+                    val afd = rh.openRawResourceFd(resourceId) ?: return START_STICKY
+                    player?.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                    afd.close()
+                    player?.isLooping = true
+                    if (!audioManager.isMusicActive) {
+                        if (sp.getBoolean(R.string.key_gradually_increase_notification_volume, false)) {
+                            currentVolumeLevel = 0
+                            player?.setVolume(0f, 0f)
+                            increaseVolumeHandler.postDelayed(volumeUpdater, VOLUME_INCREASE_INITIAL_SILENT_TIME_MILLIS)
+                        } else {
+                            player?.setVolume(1f, 1f)
+                        }
+                    }
+                    player?.prepare()
+                    player?.start()
                 }
+
+                else  -> { // RINGER_MODE_SILENT or RINGER_MODE_VIBRATE
+                    vibrator?.let { if (vibrating) it.cancel() }
+                    vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 1000, 1000), 0))
+                    vibrating = true
+                }
+
             }
-            player?.prepare()
-            player?.start()
         } catch (e: Exception) {
             aapsLogger.error("Unhandled exception", e)
         }
+//PBA End
         aapsLogger.debug(LTag.CORE, "onStartCommand End")
         return START_STICKY
     }
@@ -102,6 +140,8 @@ class AlarmSoundService : DaggerService() {
         increaseVolumeHandler.removeCallbacks(volumeUpdater)
         player?.stop()
         player?.release()
+        vibrator?.cancel() //PBA
+        vibrating = false //PBA
         aapsLogger.debug(LTag.CORE, "onDestroy End")
     }
 
